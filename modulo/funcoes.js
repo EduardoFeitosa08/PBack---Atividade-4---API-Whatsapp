@@ -92,7 +92,7 @@ function getUserConversationByNumberAndContact (userNumber, contactNumber){
     delete message.userConversation.background
 
     message.userConversation.contacts.forEach(function(item){
-        if(item.number == String(contactNumber)){
+        if(String(item.number) == String(contactNumber)){
             message.userConversation.contact = item
             delete message.userConversation.contacts
         }
@@ -117,20 +117,52 @@ function filterWithKeyWord (userNumber, word){
 
     message.contatos = dados.contatos['whats-users'].find(user => user.number === String(userNumber))
 
-    message.contatos.contacts.forEach(function(item){
-        if(item.messages.includes(word)){
-            message.mensagem = item
-        }else(
-            delete item
-        )
+    delete message.contatos.nickname
+    delete message.contatos['created-since']
+    delete message.contatos['profile-image']
+    delete message.contatos.background
+
+    message.contatos.contacts.forEach(function(contato){
+        contato.messages.forEach(function(itemMensagem){
+            if(itemMensagem.content.includes(String(word))){
+                message.contatos.mensagem = itemMensagem
+                
+            }else{
+                return MESSAGE_ERROR
+            }
+        })
+        if(message.contatos.mensagem){
+            message.contatos.contact = contato
+            delete message.contatos.contact.description
+            delete message.contatos.contact.image
+        }else{
+            delete message.contatos.contacts
+        }
     })
 
-    return message
+    message.contatos.message_with_keyword = message.contatos.mensagem
+
+    delete message.contatos.mensagem
+
+    if(message.contatos.message_with_keyword){
+        return message
+    }else{
+        return MESSAGE_ERROR
+    }
 }
 
 // console.log(getAllData())
 // console.log(getUserProfileByNumber(11987876567))
 // console.log(getUserContactsByNumber(11987876567))
 // console.log(getUserMessagesByNumber(11987876567))
-// console.log(getUserConversationByNumberAndContact(1194457796, 26999999930))
-console.log(filterWithKeyWord(11987876567, 'Leonid'))
+// console.log(getUserConversationByNumberAndContact(11987876567, 269999799601))
+// console.log(filterWithKeyWord(11966578996, 'latest'))
+
+module.exports ={
+    getAllData,
+    getUserProfileByNumber,
+    getUserContactsByNumber,
+    getUserMessagesByNumber,
+    getUserConversationByNumberAndContact,
+    filterWithKeyWord
+}
