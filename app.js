@@ -65,9 +65,9 @@ app.get('/v1/whatsapp/user/contatos/', function(request, response){
     response.json(userConversa)
 })
 
-app.get('/v1/whatsapp/user/contatos/conversa', function(request, response){
+app.get('/v1/whatsapp/user/contato/conversa', function(request, response){
     let userNumber = request.query.userNumber
-    let keyWord = request.query.keyWord
+    let keyWord = request.query.word
 
     let userMessage = dados.filterWithKeyWord(userNumber, keyWord)
 

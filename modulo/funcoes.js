@@ -115,38 +115,44 @@ function getUserConversationByNumberAndContact (userNumber, contactNumber){
 function filterWithKeyWord (userNumber, word){
     let message = {status: true, statuscode: 200, development: 'Eduardo Feitosa Batista'}
 
-    message.contatos = dados.contatos['whats-users'].find(user => user.number === String(userNumber))
+    try {
+        message.contatos = dados.contatos['whats-users'].find(user => user.number === String(userNumber))
 
-    delete message.contatos.nickname
-    delete message.contatos['created-since']
-    delete message.contatos['profile-image']
-    delete message.contatos.background
+        delete message.contatos.nickname
+        delete message.contatos['created-since']
+        delete message.contatos['profile-image']
+        delete message.contatos.background
 
-    message.contatos.contacts.forEach(function(contato){
-        contato.messages.forEach(function(itemMensagem){
-            if(itemMensagem.content.includes(String(word))){
-                message.contatos.mensagem = itemMensagem
+        message.contatos.contacts.forEach(function(contato){
+            contato.messages.forEach(function(itemMensagem){
+                if(itemMensagem.content.includes(String(word))){
+                    message.contatos.mensagem = itemMensagem
+                    message.contatos.contact = contato
+                }else{
+                    return MESSAGE_ERROR
+                }
+            })
+            if(message.contatos.mensagem){
                 
+                delete message.contatos.contact.description
+                delete message.contatos.contact.image
             }else{
-                return MESSAGE_ERROR
+                delete message.contatos.contacts
             }
         })
-        if(message.contatos.mensagem){
-            message.contatos.contact = contato
-            delete message.contatos.contact.description
-            delete message.contatos.contact.image
+
+        message.contatos.message_with_keyword = message.contatos.mensagem
+
+        delete message.contatos.mensagem
+        delete message.contatos.contacts
+
+        if(message.contatos.message_with_keyword){
+            return message
         }else{
-            delete message.contatos.contacts
+            return MESSAGE_ERROR
         }
-    })
-
-    message.contatos.message_with_keyword = message.contatos.mensagem
-
-    delete message.contatos.mensagem
-
-    if(message.contatos.message_with_keyword){
-        return message
-    }else{
+    } catch (error) {
+        console.log(error)
         return MESSAGE_ERROR
     }
 }
@@ -156,7 +162,7 @@ function filterWithKeyWord (userNumber, word){
 // console.log(getUserContactsByNumber(11987876567))
 // console.log(getUserMessagesByNumber(11987876567))
 // console.log(getUserConversationByNumberAndContact(11987876567, 269999799601))
-// console.log(filterWithKeyWord(11966578996, 'latest'))
+// console.log(filterWithKeyWord(11987876567, 'Leonid'))
 
 module.exports ={
     getAllData,
